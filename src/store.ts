@@ -38,7 +38,7 @@ export default class Store<State, Action> {
     };
   }
 
-  triggerListeners() {
+  private triggerListeners() {
     this.listeners.forEach((listener) => listener());
   }
 
@@ -50,21 +50,10 @@ export default class Store<State, Action> {
     this.reducer = newReducer;
   }
 
-  /**
-   * Get the current state.
-   *
-   * @return {Object} a copy of the current state
-   */
   getState(): State | undefined {
     return this.state;
   }
 
-  /**
-   * setState function updates the state by merging the patch object with the current state object.
-   *
-   * @param {Object} patch - an object containing the properties to be updated in the state
-   * @return {void}
-   */
   setState(newState: State) {
     this.state = newState;
     this.triggerListeners();
@@ -87,18 +76,15 @@ export function createStore<State, Action>(
 export function configureStore<State, Action>(
   reducer: Reducer<State, Action>,
   initialState?: State,
-  middlewares?: Middleware<State, Action>[],
+  ...middlewares: Middleware<State, Action>[]
 ): Store<State, Action> {
-  const Middlewares = middlewares || [];
-  return new Store(reducer, initialState, Middlewares);
+  return createStore(reducer, initialState, [...middlewares]);
 }
 
 export function combineReducers(config: {}): ReturnType<CombineReducer> {
-  return (state, action) => {
-    const result = Object.entries(config).reduce((acc, [key, reducer]) => {
+  return (state, action) =>
+    Object.entries(config).reduce((acc, [key, reducer]) => {
       const curr = state ? (reducer as Function)(state[key], action) : (reducer as Function)();
       return { ...acc, [key]: curr };
     }, {});
-    return result;
-  };
 }
