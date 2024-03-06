@@ -1,4 +1,4 @@
-import { CombineReducer, Middleware, Reducer, StoreBase } from "./index.d";
+import { Middleware, Reducer, StoreBase } from "./index.d";
 
 export default class Store<State, Action> extends StoreBase<State, Action> {
   protected listeners: Set<Function> = new Set();
@@ -43,28 +43,4 @@ export default class Store<State, Action> extends StoreBase<State, Action> {
     this.middlewares.forEach((middleware) => middleware(this));
     this.setState(this.reducer(this.state, action));
   }
-}
-
-export function createStore<State, Action>(
-  reducer: Reducer<State, Action>,
-  preloadedState?: State,
-  middlewares?: Middleware<State, Action>[],
-): Store<State, Action> {
-  return new Store(reducer, preloadedState, middlewares);
-}
-
-export function configureStore<State, Action>(
-  reducer: Reducer<State, Action>,
-  initialState?: State,
-  ...middlewares: Middleware<State, Action>[]
-): Store<State, Action> {
-  return createStore(reducer, initialState, [...middlewares]);
-}
-
-export function combineReducers(config: {}): ReturnType<CombineReducer> {
-  return (state, action) =>
-    Object.entries(config).reduce((acc, [key, reducer]) => {
-      const curr = state ? (reducer as Function)(state[key], action) : (reducer as Function)();
-      return { ...acc, [key]: curr };
-    }, {});
 }

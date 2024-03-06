@@ -1,10 +1,10 @@
 export abstract class StoreBase<State, Action> {
-  protected abstract dispatch(action: Action): void;
-  protected abstract setState(newState: State): void;
-  protected abstract getState(): State | undefined;
-  protected abstract replaceReducer(newReducer: Reducer<State, Action>): void;
-  protected abstract subscribe(listener: Function): Function;
-  protected abstract unsubscribe(listener: Function): void;
+  abstract dispatch(action: Action): void;
+  abstract setState(newState: State): void;
+  abstract getState(): State | undefined;
+  abstract replaceReducer(newReducer: Reducer<State, Action>): void;
+  abstract subscribe(listener: Function): Function;
+  abstract unsubscribe(listener: Function): void;
   protected abstract triggerListeners(): void;
   protected abstract middlewares: Middleware<State, Action>[];
 
