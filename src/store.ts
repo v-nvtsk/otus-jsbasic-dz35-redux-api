@@ -1,35 +1,15 @@
-export type Reducer<State, Action> = (state: State | undefined, action: Action) => State;
+import { CombineReducer, Middleware, Reducer, StoreBase } from "./index.d";
 
-export type Middleware<State, Action> = (
-  store: Store<State, Action>,
-) => (next: (action: Action) => any) => (action: Action) => any;
-
-export type ConfigureStore<State, Action> = (
-  reducer: Reducer<State, Action>,
-  initialState?: State | undefined,
-) => Store<State, Action>;
-
-type CombineReducer<ReducersConfig = any, Action = { type: any }> = (config: {
-  [key in keyof ReducersConfig]: (state: ReducersConfig[key] | undefined, action: Action) => ReducersConfig[key];
-}) => (
-  state:
-    | {
-        [key in keyof ReducersConfig]: ReducersConfig[key];
-      }
-    | undefined,
-  action: Action,
-) => {
-  [key in keyof ReducersConfig]: ReducersConfig[key];
-};
-
-export default class Store<State, Action> {
-  private listeners: Set<Function> = new Set();
+export default class Store<State, Action> extends StoreBase<State, Action> {
+  protected listeners: Set<Function> = new Set();
 
   constructor(
     protected reducer: Reducer<State, Action>,
     protected state: State | undefined,
     protected middlewares: Middleware<State, Action>[] = [],
-  ) {}
+  ) {
+    super();
+  }
 
   subscribe(listener: Function) {
     this.listeners.add(listener);
@@ -38,7 +18,7 @@ export default class Store<State, Action> {
     };
   }
 
-  private triggerListeners() {
+  protected triggerListeners() {
     this.listeners.forEach((listener) => listener());
   }
 
